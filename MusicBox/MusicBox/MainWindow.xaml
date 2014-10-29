@@ -17,7 +17,6 @@
                                 <Setter Property="FontWeight" Value="ExtraBlack"/>
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="FontStyle" Value="Italic" />
                             </Trigger>
 
                         </ControlTemplate.Triggers>
@@ -103,7 +102,7 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type Button}">
-                        <Border x:Name="Chrome" BorderBrush="White" BorderThickness="2" CornerRadius="1" 
+                        <Border x:Name="Chrome" 
                             Background="{TemplateBinding Property=Background}">
                             <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
                                           Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" 
@@ -114,6 +113,7 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        
     </Window.Resources>
 
 
@@ -186,7 +186,7 @@
                 </Image>
             </Button>
 
-            <Button Name="labelSong" HorizontalAlignment="Left" Height="18" Margin="226,0,0,0" VerticalAlignment="Top" Width="21" Background="{x:Null}" BorderBrush="{x:Null}" Focusable="False" Click="Button_Click" Cursor="Hand">
+            <Button HorizontalAlignment="Left" Height="18" Margin="226,0,0,0" VerticalAlignment="Top" Width="21" Background="{x:Null}" BorderBrush="{x:Null}" Focusable="False" Click="Button_Click" Cursor="Hand">
                 <Image Source="./style/exit.png" RenderOptions.BitmapScalingMode="HighQuality" Width="18" RenderTransformOrigin="0.486,0.464" Height="18"/>
             </Button>
 
@@ -255,10 +255,17 @@
 
             <TextBox Name="textboxSearch" Visibility="Collapsed" HorizontalAlignment="Left" Height="20" Margin="10,74,0,0" VerticalAlignment="Top" Width="231" Text=""/>
 
-            <Slider Name="sliProgress" Thumb.DragStarted="sliProgress_DragStarted"  Thumb.DragCompleted="sliProgress_DragCompleted" Visibility="Visible" Style="{StaticResource Horizontal_Slider}" VerticalAlignment="Center"  Value="0" Margin="10,72,10,254.2"/>
-            <ListBox Name="playList" ItemContainerStyle="{StaticResource RoundedItem}" HorizontalAlignment="Left" Height="205" Margin="10,95,0,0" VerticalAlignment="Top" Width="231"/>
+            <Slider Name="sliProgress" Thumb.DragStarted="sliProgress_DragStarted"  Thumb.DragCompleted="sliProgress_DragCompleted" Style="{StaticResource Horizontal_Slider}" VerticalAlignment="Center"  Value="0" Margin="10,72,10,254.2" IsEnabled="False">
+                <Slider.Effect>
+                    <DropShadowEffect BlurRadius="9" Opacity="0.25" ShadowDepth="4"/>
+                </Slider.Effect>
+            </Slider>
+            <!--Visibility="Collapsed"-->
+            <ListBox  Name="playList" Cursor="Hand" ItemContainerStyle="{StaticResource RoundedItem}" HorizontalAlignment="Left" Height="205" Margin="10,95,0,0" VerticalAlignment="Top" Width="231" SelectionChanged="playList_SelectionChanged" TextOptions.TextHintingMode="Fixed" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+            </ListBox>
             <MediaElement LoadedBehavior="Manual" UnloadedBehavior="Manual" MediaOpened="Element_AudioOpened" Name="mediaElement" Margin="117,250,10,47.2" Volume="1" />
-            <Label Content="Current song" HorizontalAlignment="Left" HorizontalContentAlignment="Center" Height="25" Margin="49,-3,0,0" VerticalAlignment="Top" Width="182" FontSize="10" FontStyle="Italic" TextOptions.TextHintingMode="Animated" TextOptions.TextFormattingMode="Display" MouseLeftButtonDown="Label_MouseLeftButtonDown"/>
+            <Label Name="labelSong" Content="" HorizontalAlignment="Left" HorizontalContentAlignment="Center" Height="25" Margin="49,-3,0,0" VerticalAlignment="Top" Width="182" FontSize="10" FontStyle="Italic" TextOptions.TextHintingMode="Animated" TextOptions.TextFormattingMode="Display" MouseLeftButtonDown="Label_MouseLeftButtonDown"/>
+            <Label HorizontalContentAlignment="Center" Name="loadingText" Content="Подождите, идет загрузка..." HorizontalAlignment="Left" Height="32" Margin="18,176,0,0" VerticalAlignment="Top" Width="213" FontWeight="Medium" FontSize="14" ScrollViewer.VerticalScrollBarVisibility="Disabled"/>
 
         </Grid>
     </Border>

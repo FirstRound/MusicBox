@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MusicBox
 {
-    class Settings
+    class VkSettings
     {
         public static String Login;
         public static String Password;

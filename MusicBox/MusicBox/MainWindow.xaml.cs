@@ -37,6 +37,7 @@ namespace MusicBox
         public MainWindow()
         {
             InitializeComponent();
+
             labelSong.MouseLeftButtonDown += new MouseButtonEventHandler(Label_MouseLeftButtonDown);
             backgroundThread.DoWork += backgroundThread_GetAudio;
 
@@ -53,6 +54,10 @@ namespace MusicBox
                 sliProgress.Minimum = 0;
                 sliProgress.Maximum = mediaElement.NaturalDuration.TimeSpan.TotalSeconds;
                 sliProgress.Value = mediaElement.Position.TotalSeconds;
+                if (mediaElement.NaturalDuration == mediaElement.Position)
+                {
+                    this.btnNext_Click(null, null);
+                }
             }
         }
 
@@ -93,11 +98,19 @@ namespace MusicBox
 
         private void Label_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            this.DragMove();
+            try
+            {
+                this.DragMove();
+            }
+            catch(Exception ex)
+            {
+
+            }
         }
 
         private void btnPlay_Click(object sender, RoutedEventArgs e)
         {
+            sliProgress.IsEnabled = true;
             if (!is_play)
             {
                 if (audio_list.Count > current_song)
@@ -105,6 +118,8 @@ namespace MusicBox
                     if (mediaElement.Source != new Uri(audio_list[current_song].url))
                         mediaElement.Source = new Uri(audio_list[current_song].url);
                     is_play = true;
+                    playList.SelectedIndex = current_song;
+                    labelSong.Content = audio_list[current_song].artist + ": " + audio_list[current_song].title;
                     mediaElement.Play();
                 }
             }
@@ -120,15 +135,17 @@ namespace MusicBox
             backgroundThread.RunWorkerAsync();
         }
 
-        private void btnNext_Click(object sender, RoutedEventArgs e)
+        public void btnNext_Click(object sender, RoutedEventArgs e)
         {
             if (current_song + 1 <= audio_list.Count - 1)
             {
                 current_song++;
+                playList.SelectedIndex++;
             }
             if (is_play)
             {
                 mediaElement.Source = new Uri(audio_list[current_song].url);
+                labelSong.Content = audio_list[current_song].artist + ": " + audio_list[current_song].title;
                 mediaElement.Play();
             }
         }
@@ -138,10 +155,12 @@ namespace MusicBox
             if (current_song - 1 >= 0)
             {
                 current_song--;
+                playList.SelectedIndex--;
             }
             if (is_play)
             {
                 mediaElement.Source = new Uri(audio_list[current_song].url);
+                labelSong.Content = audio_list[current_song].artist + ": " + audio_list[current_song].title;
                 mediaElement.Play();
             }
         }
@@ -153,20 +172,26 @@ namespace MusicBox
             
         }
 
+        private void playList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            current_song = playList.SelectedIndex;
+            mediaElement.Source = new Uri(audio_list[current_song].url);
+            labelSong.Content = audio_list[current_song].artist + ": " + audio_list[current_song].title;
+            is_play = true;
+            mediaElement.Play();
+        }
+
 
         //BEGIN PRIVATE METHODS
 
         private void backgroundThread_GetAudio(object sender, DoWorkEventArgs e)
         {
-            // Проверка, авторизовался ли пользователь
-            while (!Settings.Auth)
-            {
-                Thread.Sleep(500);
-            }
             audio_list = request.getMyAudioList();
 
             if(playList.Dispatcher.CheckAccess())
             {
+                loadingText.Visibility = System.Windows.Visibility.Collapsed;
+                playList.Visibility = System.Windows.Visibility.Visible;
                 for (int i = 0; i < audio_list.Count; i++)
                 {
                     playList.Items.Add(audio_list[i].title);
@@ -174,12 +199,15 @@ namespace MusicBox
             }
             else
             {
-                playList.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate(){
-                    for (int i = 0; i < audio_list.Count; i++)
+                playList.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate()
                     {
-                        playList.Items.Add(audio_list[i].title);
-                    }
-                }));
+                        loadingText.Visibility = System.Windows.Visibility.Collapsed;
+                        playList.Visibility = System.Windows.Visibility.Visible;
+                        for (int i = 0; i < audio_list.Count; i++)
+                        {
+                            playList.Items.Add(audio_list[i].title);
+                        }
+                    }));
                 }
         }
 

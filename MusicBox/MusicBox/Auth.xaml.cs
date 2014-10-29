@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -31,6 +32,7 @@ namespace MusicBox
 
         private void webBrowser_Navigating(object sender, System.Windows.Navigation.NavigatingCancelEventArgs e)
         {
+
         }
 
         private void webBrowser_LoadCompleted(object sender, System.Windows.Navigation.NavigationEventArgs e)
@@ -41,10 +43,9 @@ namespace MusicBox
                 String info = url.Split('#')[1];
                 if (info[0] == 'a')
                 {
-                    Settings.Token = info.Split('&')[0].Split('=')[1];
-                    Settings.Id = info.Split('=')[3];
-                    Settings.Auth = true;
-                    MessageBox.Show("Ok!");
+                    VkSettings.Token = info.Split('&')[0].Split('=')[1];
+                    VkSettings.Id = info.Split('=')[3];
+                    VkSettings.Auth = true;
                     MainWindow mw = new MainWindow();
                     this.Hide();
                     mw.Show();

@@ -1,9 +1,9 @@
 ﻿<Window x:Class="MusicBox.Auth"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Auth" Height="300" Width="300" WindowStyle="None">
+        Title="Auth" Height="468.2" Width="683.2" WindowStyle="None">
 
-    <Grid>
-        <WebBrowser Name="webBrowser" HorizontalAlignment="Left" Height="294" Margin="0,0,-0.4,-0.4" VerticalAlignment="Top" Width="294" Loaded="WebBrowser_Loaded" Navigating="webBrowser_Navigating" LoadCompleted="webBrowser_LoadCompleted"/>
+    <Grid Background="White">
+        <WebBrowser Visibility="Hidden" Name="webBrowser" HorizontalAlignment="Left" Height="462" Margin="0,0,-0.2,-0.4" VerticalAlignment="Top" Width="677" Loaded="WebBrowser_Loaded" Navigating="webBrowser_Navigating" LoadCompleted="webBrowser_LoadCompleted"/>
     </Grid>
 </Window>

@@ -14,7 +14,7 @@ namespace MusicBox
     {
         public List<Audio> getMyAudioList()
         {
-            WebRequest request = WebRequest.Create("https://api.vk.com/method/audio.get?owner_id="+Settings.Id+"&need_user=0&access_token=" + Settings.Token);
+            WebRequest request = WebRequest.Create("https://api.vk.com/method/audio.get?owner_id="+VkSettings.Id+"&need_user=0&access_token=" + VkSettings.Token);
             WebResponse response = request.GetResponse();
             Stream data_stream = response.GetResponseStream();
             StreamReader reader = new StreamReader(data_stream);
