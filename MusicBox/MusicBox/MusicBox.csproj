@@ -58,12 +58,13 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AppSettings.cs" />
     <Compile Include="Audio.cs" />
     <Compile Include="Auth.xaml.cs">
       <DependentUpon>Auth.xaml</DependentUpon>
     </Compile>
     <Compile Include="Request.cs" />
-    <Compile Include="Settings.cs" />
+    <Compile Include="VkSettings.cs" />
     <Page Include="Auth.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -140,6 +141,21 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Style\bg3.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Style\repeat.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Style\volume.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Style\random.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Style\advise.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Style\popular.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
