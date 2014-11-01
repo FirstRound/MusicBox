@@ -4,6 +4,12 @@
         Title="MusicBox" Height="350" Width="251.4" ResizeMode="NoResize" WindowStyle="None">
     <Window.Resources>
 
+        <ContextMenu x:Key="TrayMenu">
+            <MenuItem Header="Развернуть" Click="ShowHideMainWindow" />
+            <Separator />
+            <MenuItem Header="Выйти" Click="MenuExitClick" />
+        </ContextMenu>
+
         <Style x:Key="RoundedItem" TargetType="ListBoxItem">
             <Setter Property="Template">
                 <Setter.Value>
@@ -119,7 +125,7 @@
 
     <!-- Main -->
     <Border BorderBrush="Black" BorderThickness="2">
-        <Grid Margin="0,0,0.2,-0.6" RenderTransformOrigin="0.498,0.628" Loaded="Grid_Loaded">
+        <Grid Margin="0,0,0.2,-0.6" RenderTransformOrigin="0.498,0.628" Loaded="Grid_Loaded" MouseLeftButtonDown="Grid_MouseLeftButtonDown">
             <Grid.RowDefinitions>
                 <RowDefinition/>
             </Grid.RowDefinitions>
@@ -186,11 +192,7 @@
                 </Image>
             </Button>
 
-            <Button Name="btnExit" HorizontalAlignment="Left" Height="18" Margin="226,0,0,0" VerticalAlignment="Top" Width="21" Background="{x:Null}" BorderBrush="{x:Null}" Focusable="False" Click="Button_Click" Cursor="Hand">
-                <Image Source="./style/exit.png" RenderOptions.BitmapScalingMode="HighQuality" Width="18" RenderTransformOrigin="0.486,0.464" Height="18"/>
-            </Button>
-
-            <Button Name="btnSearch" Visibility="Collapsed" Style="{DynamicResource ButtonStyle1}" HorizontalAlignment="Left" Height="21" Margin="220,24,0,0" VerticalAlignment="Top" Width="21" Background="{x:Null}" BorderBrush="{x:Null}" Cursor="Hand" Focusable="False" Click="btnSearch_Click">
+            <Button Name="btnSearch" Visibility="Collapsed" Style="{DynamicResource ButtonStyle1}" HorizontalAlignment="Left" Height="21" Margin="219,23,0,0" VerticalAlignment="Top" Width="21" Background="{x:Null}" BorderBrush="{x:Null}" Cursor="Hand" Focusable="False" Click="btnSearch_Click">
                 <Image Source="Style/search.png" RenderOptions.BitmapScalingMode="HighQuality">
                     <Image.Triggers>
                         <EventTrigger RoutedEvent="MouseDown">
@@ -206,7 +208,7 @@
                 </Image>
             </Button>
 
-            <Button x:Name="btnAdd" Visibility="Collapsed" Style="{DynamicResource ButtonStyle1}" HorizontalAlignment="Left" Height="21" Margin="220,49,0,0" VerticalAlignment="Top" Width="21" Background="{x:Null}" BorderBrush="{x:Null}" Cursor="Hand" Focusable="False" Click="btnAdd_Click" RenderTransformOrigin="0.5,0.5">
+            <Button x:Name="btnAdd" Visibility="Collapsed" Style="{DynamicResource ButtonStyle1}" HorizontalAlignment="Left" Height="21" Margin="219,53,0,0" VerticalAlignment="Top" Width="21" Background="{x:Null}" BorderBrush="{x:Null}" Cursor="Hand" Focusable="False" Click="btnAdd_Click" RenderTransformOrigin="0.5,0.5">
                 <Button.RenderTransform>
                     <TransformGroup>
                         <ScaleTransform/>
@@ -230,7 +232,7 @@
                 </Image>
             </Button>
 
-            <Button x:Name="btnRepeat" Style="{DynamicResource ButtonStyle1}" HorizontalAlignment="Left" Height="21" Margin="10,51,0,0" VerticalAlignment="Top" Width="25" Background="{x:Null}" BorderBrush="{x:Null}" Cursor="Hand" Focusable="False" Click="btnRepeat_Click" Opacity="0.3">
+            <Button x:Name="btnRepeat" Style="{DynamicResource ButtonStyle1}" HorizontalAlignment="Left" Height="21" Margin="8,51,0,0" VerticalAlignment="Top" Width="25" Background="{x:Null}" BorderBrush="{x:Null}" Cursor="Hand" Focusable="False" Click="btnRepeat_Click" Opacity="0.3">
                 <Image Source="Style/repeat.png" RenderOptions.BitmapScalingMode="HighQuality" Width="19" RenderTransformOrigin="0.5,0.5">
                     <Image.RenderTransform>
                         <TransformGroup>
@@ -257,13 +259,18 @@
             <ListBox  Name="playList" Cursor="Hand" ItemContainerStyle="{StaticResource RoundedItem}" HorizontalAlignment="Left" Height="207" Margin="10,93,0,0" VerticalAlignment="Top" Width="231" SelectionChanged="playList_SelectionChanged" TextOptions.TextHintingMode="Fixed" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
             </ListBox>
             <MediaElement LoadedBehavior="Manual" UnloadedBehavior="Manual" MediaOpened="Element_AudioOpened" Name="mediaElement" Margin="117,250,10,47.2" Volume="1" />
-            <Label Content="MusicBox" Name="labelSong" HorizontalAlignment="Left" HorizontalContentAlignment="Center" Height="25" Margin="44,-3,0,0" VerticalAlignment="Top" Width="177" FontSize="10" FontStyle="Italic" TextOptions.TextHintingMode="Animated" TextOptions.TextFormattingMode="Display" MouseLeftButtonDown="Label_MouseLeftButtonDown"/>
+            <Label Content="MusicBox" Name="labelSong" HorizontalAlignment="Left" HorizontalContentAlignment="Center" Height="25" Margin="44,-3,0,0" VerticalAlignment="Top" Width="182" FontSize="10" FontStyle="Italic" TextOptions.TextHintingMode="Animated" TextOptions.TextFormattingMode="Display" MouseLeftButtonDown="Label_MouseLeftButtonDown"/>
             <Label HorizontalContentAlignment="Center" Name="loadingText" Content="Подождите, идет загрузка..." HorizontalAlignment="Left" Height="32" Margin="18,176,0,0" VerticalAlignment="Top" Width="213" FontWeight="Medium" FontSize="14" ScrollViewer.VerticalScrollBarVisibility="Disabled"/>
-            <Label Name="labelTime" HorizontalContentAlignment="Center" Content="3:34" HorizontalAlignment="Left" Height="16" Margin="183,23,0,0" VerticalAlignment="Top" Width="48" FontSize="10" ScrollViewer.VerticalScrollBarVisibility="Disabled" VerticalContentAlignment="Stretch" Padding="0" Grid.IsSharedSizeScope="True"/>
+            <Label Name="labelTime" HorizontalContentAlignment="Center" Content="3:34" HorizontalAlignment="Left" Height="16" Margin="190,23,0,0" VerticalAlignment="Top" Width="31" FontSize="10" ScrollViewer.VerticalScrollBarVisibility="Disabled" VerticalContentAlignment="Stretch" Padding="0" Grid.IsSharedSizeScope="True"/>
 
-            <Menu Name="menuStripe" Visibility="Collapsed" HorizontalAlignment="Left" Height="18" VerticalAlignment="Top" Width="226"/>
 
-            <Button Name="btnMenu" Style="{DynamicResource ButtonStyle1}" HorizontalAlignment="Left" Height="35" VerticalAlignment="Top" Width="44"  Background="{x:Null}" BorderBrush="{x:Null}" Cursor="Hand" Focusable="False" Click="btnMenu_Click">
+            <Button Name="btnMinimize" Visibility="Visible" HorizontalAlignment="Left" Height="18" Margin="226,0,0,0" VerticalAlignment="Top" Width="21" Background="{x:Null}" BorderBrush="{x:Null}" Focusable="False" Cursor="Hand" Click="btnMinimize_Click">
+                <Image Source="./style/minimize.png" RenderOptions.BitmapScalingMode="HighQuality" Width="15" RenderTransformOrigin="0.486,0.464" Height="18"/>
+            </Button>
+
+            <Menu Name="menuStripe" Visibility="Collapsed" HorizontalAlignment="Left" Height="18" VerticalAlignment="Top" Width="247"/>
+            
+            <Button Name="btnMenu" Style="{DynamicResource ButtonStyle1}" HorizontalAlignment="Left" Height="35" VerticalAlignment="Top" Width="44"  Background="{x:Null}" BorderBrush="{x:Null}" Cursor="Hand" Focusable="False" Click="btnMenu_Click" Margin="-2,0,0,0">
                 <Image Source="Style/logo.png"  RenderOptions.BitmapScalingMode="HighQuality" Tag="1">
                     <Image.Triggers>
                         <EventTrigger RoutedEvent="MouseDown">
@@ -279,7 +286,11 @@
                 </Image>
             </Button>
 
-            <Button x:Name="btnVolume" Style="{DynamicResource ButtonStyle1}" HorizontalAlignment="Left" Height="21" Margin="220,52,0,0" VerticalAlignment="Top" Width="21" Background="{x:Null}" BorderBrush="{x:Null}" Cursor="Hand" Focusable="False" Click="btnVolume_Click" >
+            <Button Name="btnExit" Visibility="Collapsed" HorizontalAlignment="Left" Height="18" Margin="226,0,0,0" VerticalAlignment="Top" Width="21" Background="{x:Null}" BorderBrush="{x:Null}" Focusable="False" Click="Button_Click" Cursor="Hand">
+                <Image Source="./style/exit.png" RenderOptions.BitmapScalingMode="HighQuality" Width="18" RenderTransformOrigin="0.486,0.464" Height="18"/>
+            </Button>
+
+            <Button x:Name="btnVolume" Style="{DynamicResource ButtonStyle1}" HorizontalAlignment="Left" Height="21" Margin="219,52,0,0" VerticalAlignment="Top" Width="21" Background="{x:Null}" BorderBrush="{x:Null}" Cursor="Hand" Focusable="False" Click="btnVolume_Click" >
                 <Image Source="Style/volume.png" RenderOptions.BitmapScalingMode="HighQuality">
                     <Image.Triggers>
                         <EventTrigger RoutedEvent="UIElement.MouseDown">
@@ -294,22 +305,23 @@
                 </Image>
             </Button>
 
-            <Button x:Name="btnRandom" Visibility="Visible"  Style="{DynamicResource ButtonStyle1}" HorizontalAlignment="Left" Height="21" Margin="35,52,0,0" VerticalAlignment="Top" Width="21" Background="{x:Null}" BorderBrush="{x:Null}" Cursor="Hand" Focusable="False" Click="btnRandom_Click" Opacity="0.3" >
+            <Button x:Name="btnRandom" Visibility="Visible"  Style="{DynamicResource ButtonStyle1}" HorizontalAlignment="Left" Height="21" Margin="32,52,0,0" VerticalAlignment="Top" Width="21" Background="{x:Null}" BorderBrush="{x:Null}" Cursor="Hand" Focusable="False" Click="btnRandom_Click" Opacity="0.3" >
                 <Image Source="Style/random.png" RenderOptions.BitmapScalingMode="HighQuality"/>
             </Button>
 
-            <Button x:Name="btnAdvise" Visibility="Collapsed" Style="{DynamicResource ButtonStyle1}" HorizontalAlignment="Left" Height="21" Margin="36,48,0,0" VerticalAlignment="Top" Width="21" Background="{x:Null}" BorderBrush="{x:Null}" Cursor="Hand" Focusable="False" Opacity="0.3" >
+            <Button x:Name="btnAdvise" Visibility="Collapsed" Style="{DynamicResource ButtonStyle1}" HorizontalAlignment="Left" Height="21" Margin="32,53,0,0" VerticalAlignment="Top" Width="21" Background="{x:Null}" BorderBrush="{x:Null}" Cursor="Hand" Focusable="False" Opacity="0.3" Click="btnAdvise_Click" >
                 <Image Source="Style/advise.png" RenderOptions.BitmapScalingMode="HighQuality">
 
                 </Image>
             </Button>
 
-            <Button x:Name="btnPopular" Visibility="Collapsed" Style="{DynamicResource ButtonStyle1}" HorizontalAlignment="Left" Height="21" Margin="10,47,0,0" VerticalAlignment="Top" Width="21" Background="{x:Null}" BorderBrush="{x:Null}" Cursor="Hand" Focusable="False" Opacity="0.3" >
+            <Button x:Name="btnPopular" Visibility="Collapsed" Style="{DynamicResource ButtonStyle1}" HorizontalAlignment="Left" Height="21" Margin="8,51,0,0" VerticalAlignment="Top" Width="21" Background="{x:Null}" BorderBrush="{x:Null}" Cursor="Hand" Focusable="False" Opacity="0.3" Click="btnPopular_Click" >
                 <Image Source="Style/popular.png" RenderOptions.BitmapScalingMode="HighQuality">
 
                 </Image>
             </Button>
-            <Slider Name="sliderVolume" Visibility="Collapsed" Style="{StaticResource Horizontal_Slider}" HorizontalAlignment="Left" Height="19" Margin="214,19,-16,0" VerticalAlignment="Top" Width="49" RenderTransformOrigin="0.5,0.5">
+            
+            <Slider Name="sliderVolume" Visibility="Collapsed" Style="{StaticResource Horizontal_Slider}" HorizontalAlignment="Left" Height="19" Margin="214,19,-16,0" VerticalAlignment="Top" Width="49" RenderTransformOrigin="0.5,0.5" Value="{Binding Volume, ElementName=mediaElement, Mode=TwoWay}" Maximum="1" >
                 <Slider.RenderTransform>
                     <TransformGroup>
                         <ScaleTransform/>
@@ -319,6 +331,21 @@
                     </TransformGroup>
                 </Slider.RenderTransform>
             </Slider>
+            
+            <Button x:Name="btnDownload" Visibility="Collapsed"  Style="{DynamicResource ButtonStyle1}" HorizontalAlignment="Left" Height="21" Margin="196,52,0,0" VerticalAlignment="Top" Width="21" Background="{x:Null}" BorderBrush="{x:Null}" Cursor="Hand" Focusable="False" Opacity="1.0" Click="btnDownload_Click" >
+                <Image Source="Style/download.png" RenderOptions.BitmapScalingMode="HighQuality">
+                    <Image.Triggers>
+                        <EventTrigger RoutedEvent="UIElement.MouseDown">
+                            <BeginStoryboard>
+                                <Storyboard x:Name="btnDownloadAnim">
+                                    <DoubleAnimation Storyboard.TargetProperty="Opacity" From="1.0" To="0.3" Storyboard.TargetName="btnDownload"
+            							AutoReverse="True" Duration="0:0:0.3"/>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </Image.Triggers>
+                </Image>
+            </Button>
 
         </Grid>
     </Border>

@@ -17,5 +17,8 @@ namespace MusicBox
         public static bool MenuOn = false;
         public static bool RandomOrder = false;
         public static bool VolumeActive = false;
+        public static bool AdviseMode = false;
+        public static bool PopularMode = false;
+        public static bool IsDownloading = false;
     }
 }
