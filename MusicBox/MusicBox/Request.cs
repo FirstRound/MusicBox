@@ -1,11 +1,12 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
-using System.Threading.Tasks;
+//using System.Threading.Tasks;
 using System.Web;
 
 namespace MusicBox
@@ -79,7 +80,10 @@ namespace MusicBox
                 String response_from_server = sendRequest(request_text);
 
                 JToken token = JToken.Parse(response_from_server);
+                //JObject token = JObject.Parse(response_from_server);
                 audio_list = token["response"].Children().Skip(1).Select(c => c.ToObject<Audio>()).ToList();
+                //audio_list = JsonConvert.DeserializeObject<List<Audio>>(response_from_server);
+                
             }
             catch
             {

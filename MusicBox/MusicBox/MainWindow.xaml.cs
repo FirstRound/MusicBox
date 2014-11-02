@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+//using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -49,8 +49,8 @@ namespace MusicBox
 
             DispatcherTimer timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromSeconds(1);
-            timer.Tick += timer_Tick;
-            timer.Start();
+            BackgroundWorker bw = new BackgroundWorker();
+            bw.DoWork += timer_Tick;
         }
 
         protected override void OnSourceInitialized(EventArgs e)
@@ -348,6 +348,8 @@ namespace MusicBox
                 mediaElement.Play();
                 checkAdd(audio_list[current_song]);
             }
+
+            playList.ScrollIntoView(playList.SelectedItem);
         }
 
 
@@ -552,37 +554,13 @@ namespace MusicBox
 
         private void backgroundThread_GetAudio(object sender, DoWorkEventArgs e)
         {
-            if (playList.Dispatcher.CheckAccess())
-            {
-                playList.Items.Clear();
-                loadingText.Visibility = System.Windows.Visibility.Visible;
-            }
-            else
-            {
-                playList.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate()
-                {
-                    playList.Items.Clear();
-                    loadingText.Visibility = System.Windows.Visibility.Visible;
-                }));
-            }
+            clearPlayList();
 
             audio_list = request.getMyAudioList();
             my_audio = audio_list;
             setOrder(audio_list, order);
 
-            if (playList.Dispatcher.CheckAccess())
-            {
-                loadingText.Visibility = System.Windows.Visibility.Collapsed;
-                fillListBox(audio_list);
-            }
-            else
-            {
-                playList.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate()
-                    {
-                        loadingText.Visibility = System.Windows.Visibility.Collapsed;
-                        fillListBox(audio_list);
-                    }));
-            }
+            fillPlayList(audio_list);
         }
 
         private void backgroundThread_SearchAudio(object sender, DoWorkEventArgs e)
@@ -606,55 +584,29 @@ namespace MusicBox
 
             audio_list = request.searchAudio(search);
 
-            if (playList.Dispatcher.CheckAccess())
-            {
-                loadingText.Visibility = System.Windows.Visibility.Collapsed;
-                fillListBox(audio_list);
-            }
-            else
-            {
-                playList.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate()
-                {
-                    loadingText.Visibility = System.Windows.Visibility.Collapsed;
-                    fillListBox(audio_list);
-                }));
-            }
+            fillPlayList(audio_list);
         }
 
         private void backgroundThread_GetPopularAudio(object sender, DoWorkEventArgs e)
         {
-            if (playList.Dispatcher.CheckAccess())
-            {
-                playList.Items.Clear();
-                loadingText.Visibility = System.Windows.Visibility.Visible;
-            }
-            else
-            {
-                playList.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate()
-                {
-                    playList.Items.Clear();
-                    loadingText.Visibility = System.Windows.Visibility.Visible;
-                }));
-            }
+            clearPlayList();
 
             audio_list = request.getPopularAudioList();
 
-            if (playList.Dispatcher.CheckAccess())
-            {
-                loadingText.Visibility = System.Windows.Visibility.Collapsed;
-                fillListBox(audio_list);
-            }
-            else
-            {
-                playList.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate()
-                {
-                    loadingText.Visibility = System.Windows.Visibility.Collapsed;
-                    fillListBox(audio_list);
-                }));
-            }
+            fillPlayList(audio_list);
         }
 
         private void backgroundThread_GetAdviseAudio(object sender, DoWorkEventArgs e)
+        {
+            clearPlayList();
+
+            audio_list = request.getAdviseAudioList();
+
+            fillPlayList(audio_list);
+        }
+
+
+        private void clearPlayList()
         {
             if (playList.Dispatcher.CheckAccess())
             {
@@ -669,23 +621,26 @@ namespace MusicBox
                     loadingText.Visibility = System.Windows.Visibility.Visible;
                 }));
             }
+        }
 
-            audio_list = request.getAdviseAudioList();
-
+        private void fillPlayList(List<Audio> list)
+        {
             if (playList.Dispatcher.CheckAccess())
             {
                 loadingText.Visibility = System.Windows.Visibility.Collapsed;
-                fillListBox(audio_list);
+                fillListBox(list);
             }
             else
             {
                 playList.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate()
                 {
                     loadingText.Visibility = System.Windows.Visibility.Collapsed;
-                    fillListBox(audio_list);
+                    fillListBox(list);
                 }));
             }
         }
+
+
 
         private void backgroundThread_DownloadAudio(object sender, DoWorkEventArgs e)
         {
