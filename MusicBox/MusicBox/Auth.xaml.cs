@@ -43,7 +43,7 @@ namespace MusicBox
             try
             {
                 while (IsAuth > 0)
-                {
+                {   
                     String url = webBrowser.Source.ToString();
                     if (url[20] == 'e' || url == request)
                     {
