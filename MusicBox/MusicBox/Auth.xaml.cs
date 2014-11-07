@@ -42,37 +42,22 @@ namespace MusicBox
         {
             try
             {
-                while (IsAuth > 0)
-                {   
-                    String url = webBrowser.Source.ToString();
-                    if (url[20] == 'e' || url == request)
-                    {
-                        WebBrowser_Loaded(null, null);
-                        IsAuth--;
-                        continue;
-                    }
-                    String info = url.Split('#')[1];
-                    if (info[0] == 'a')
-                    {
-                        IsAuth = -1;
-                        VkSettings.Token = info.Split('&')[0].Split('=')[1];
-                        VkSettings.Id = info.Split('=')[3];
-                        VkSettings.Auth = true;
-                        MainWindow mw = new MainWindow();
-                        this.Hide();
-                        mw.Show();
-                        break;
-                    }
+                String url = webBrowser.Source.ToString();
+                String info = url.Split('#')[1];
+                if (info[0] == 'a')
+                {
+                    VkSettings.Token = info.Split('&')[0].Split('=')[1];
+                    VkSettings.Id = info.Split('=')[3];
+                    VkSettings.Auth = true;
+                    MainWindow mw = new MainWindow();
+                    this.Hide();
+                    mw.Show();
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }
-            if (IsAuth == 0)
-            {
-                MessageBox.Show("Ошибки при подключении к интернету");
-            }  
         }
     }
 }
