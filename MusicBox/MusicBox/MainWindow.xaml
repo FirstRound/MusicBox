@@ -10,6 +10,9 @@
             <MenuItem Header="Выйти" Click="MenuExitClick" />
         </ContextMenu>
 
+  
+
+
         <Style x:Key="RoundedItem" TargetType="ListBoxItem">
             <Setter Property="Template">
                 <Setter.Value>
@@ -256,10 +259,19 @@
                 </Slider.Effect>
             </Slider>
             <!--Visibility="Collapsed"-->
-            <ListBox  Name="playList" Cursor="Hand" ItemContainerStyle="{StaticResource RoundedItem}" HorizontalAlignment="Left" Height="207" Margin="10,93,0,0" VerticalAlignment="Top" Width="231" SelectionChanged="playList_SelectionChanged" TextOptions.TextHintingMode="Fixed" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+            <ListBox  Name="playList" Cursor="Hand" ItemContainerStyle="{StaticResource RoundedItem}" HorizontalAlignment="Left" Height="207" Margin="10,93,0,0" VerticalAlignment="Top" Width="231" SelectionChanged="playList_SelectionChanged" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                <ListBox.Resources>
+                    <Style TargetType="{x:Type ScrollBar}">
+                        <Setter Property="Stylus.IsFlicksEnabled" Value="True" />
+                        <Setter Property="Background" Value="White" />
+                        <Setter Property="BorderBrush" Value="White" />
+                        <Setter Property="Width" Value="8"/>
+                        <Setter Property="MinWidth" Value="8" />
+                    </Style>
+                </ListBox.Resources>
             </ListBox>
             <MediaElement LoadedBehavior="Manual" UnloadedBehavior="Manual" MediaOpened="Element_AudioOpened" Name="mediaElement" Margin="117,250,10,47.2" Volume="1" />
-            <Label Content="MusicBox" Name="labelSong" HorizontalAlignment="Left" HorizontalContentAlignment="Center" Height="25" Margin="44,-3,0,0" VerticalAlignment="Top" Width="182" FontSize="10" FontStyle="Italic" TextOptions.TextHintingMode="Animated" TextOptions.TextFormattingMode="Display" MouseLeftButtonDown="Label_MouseLeftButtonDown"/>
+            <Label Content="MusicBox" Name="labelSong" HorizontalAlignment="Left" HorizontalContentAlignment="Center" Height="25" Margin="44,-3,0,0" VerticalAlignment="Top" Width="182" FontSize="10" FontStyle="Italic" MouseLeftButtonDown="Label_MouseLeftButtonDown"/>
             <Label HorizontalContentAlignment="Center" Name="loadingText" Content="Подождите, идет загрузка..." HorizontalAlignment="Left" Height="32" Margin="18,176,0,0" VerticalAlignment="Top" Width="213" FontWeight="Medium" FontSize="14" ScrollViewer.VerticalScrollBarVisibility="Disabled"/>
             <Label Name="labelTime" HorizontalContentAlignment="Center" Content="3:34" HorizontalAlignment="Left" Height="16" Margin="190,23,0,0" VerticalAlignment="Top" Width="31" FontSize="10" ScrollViewer.VerticalScrollBarVisibility="Disabled" VerticalContentAlignment="Stretch" Padding="0" Grid.IsSharedSizeScope="True"/>
 
