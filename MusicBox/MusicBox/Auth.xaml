@@ -4,6 +4,6 @@
         Title="Auth" Height="468.2" Width="683.2" WindowStyle="None">
 
     <Grid Background="White">
-        <WebBrowser Visibility="Hidden" Name="webBrowser" HorizontalAlignment="Left" Height="462" Margin="0,0,-0.2,-0.4" VerticalAlignment="Top" Width="677" Loaded="WebBrowser_Loaded" Navigating="webBrowser_Navigating" LoadCompleted="webBrowser_LoadCompleted"/>
+        <WebBrowser Visibility="Visible" Name="webBrowser" HorizontalAlignment="Left" Height="462" Margin="0,0,-0.2,-0.4" VerticalAlignment="Top" Width="677" Loaded="WebBrowser_Loaded" Navigating="webBrowser_Navigating" LoadCompleted="webBrowser_LoadCompleted"/>
     </Grid>
 </Window>
