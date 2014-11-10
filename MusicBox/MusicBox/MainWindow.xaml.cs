@@ -51,6 +51,7 @@ namespace MusicBox
             timer.Interval = TimeSpan.FromSeconds(1);
             BackgroundWorker bw = new BackgroundWorker();
             bw.DoWork += timer_Tick;
+            bw.RunWorkerAsync();
         }
 
         protected override void OnSourceInitialized(EventArgs e)
