@@ -20,9 +20,6 @@ namespace MusicBox
     /// </summary>
     public partial class Auth : Window
     {
-
-        private int IsAuth = 5;
-        private String request = "https://oauth.vk.com/authorize?client_id=4609319&scope=audio&redirect_uri=https://oauth.vk.com/blank.html&display=popup&v=5.25&response_type=token";
         public Auth()
         {
             InitializeComponent();
@@ -30,7 +27,7 @@ namespace MusicBox
 
         private void WebBrowser_Loaded(object sender, RoutedEventArgs e)
         {
-            webBrowser.Navigate(new Uri(request));
+            webBrowser.Navigate(new Uri("https://oauth.vk.com/authorize?client_id=4609319&scope=audio&redirect_uri=https://oauth.vk.com/blank.html&display=popup&v=5.25&response_type=token"));
         }
 
         private void webBrowser_Navigating(object sender, System.Windows.Navigation.NavigatingCancelEventArgs e)
