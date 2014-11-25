@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-//using System.Threading.Tasks;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -28,30 +28,31 @@ namespace MusicBox
     /// </summary>
     public partial class MainWindow : Window
     {
-        private BackgroundWorker backgroundThread = new BackgroundWorker();
-        private Request request = new Request();
-        private List<Audio> audio_list = new List<Audio>();
-        private List<Audio> my_audio = new List<Audio>();
-        private List<int> order = new List<int>();
-        private int current_song = 0;
-        private bool userIsDraggingSlider = false;
-        private ContextMenu TrayMenu = null;
-        private System.Windows.Forms.NotifyIcon TrayIcon = null;
+        private BackgroundWorker _backgroundThread = new BackgroundWorker();
+        private Request _request;
+        private List<Audio> _audio_list = new List<Audio>();
+        private List<Audio> _my_audio = new List<Audio>();
+        private List<int> _order = new List<int>();
+        private int _current_song = 0;
+        private bool _user_is_dragging_slider = false;
+        private ContextMenu _tray_menu = null;
+        private System.Windows.Forms.NotifyIcon _tray_icon = null;
 
         private bool fCanClose = false;
 
-        public MainWindow()
+        public MainWindow(VkSettings vk)
         {
             InitializeComponent();
 
+            _request = new Request(vk);
+
             labelSong.MouseLeftButtonDown += new MouseButtonEventHandler(Label_MouseLeftButtonDown);
-            backgroundThread.DoWork += backgroundThread_GetAudio;
+            _backgroundThread.DoWork += backgroundThread_GetAudio;
 
             DispatcherTimer timer = new DispatcherTimer();
+            timer.Tick += timer_Tick;
             timer.Interval = TimeSpan.FromSeconds(1);
-            BackgroundWorker bw = new BackgroundWorker();
-            bw.DoWork += timer_Tick;
-            bw.RunWorkerAsync();
+            timer.Start();
         }
 
         protected override void OnSourceInitialized(EventArgs e)
@@ -63,14 +64,14 @@ namespace MusicBox
         private bool createTrayIcon()
         {
             bool result = false;
-            if (TrayIcon == null)
+            if (_tray_icon == null)
             {
-                TrayIcon = new System.Windows.Forms.NotifyIcon();
-                TrayIcon.Icon = MusicBox.Properties.Resources.favicon;
-                TrayIcon.Text = "MusicBox";
-                TrayMenu = Resources["TrayMenu"] as ContextMenu;
+                _tray_icon = new System.Windows.Forms.NotifyIcon();
+                _tray_icon.Icon = MusicBox.Properties.Resources.favicon;
+                _tray_icon.Text = "MusicBox";
+                _tray_menu = Resources["TrayMenu"] as ContextMenu;
 
-                TrayIcon.Click += delegate(object sender, EventArgs e)
+                _tray_icon.Click += delegate(object sender, EventArgs e)
                 {
                     if ((e as System.Windows.Forms.MouseEventArgs).Button == System.Windows.Forms.MouseButtons.Left)
                     {
@@ -78,7 +79,7 @@ namespace MusicBox
                     }
                     else
                     {
-                        TrayMenu.IsOpen = true;
+                        _tray_menu.IsOpen = true;
                         Activate();
                     }
                 };
@@ -88,22 +89,22 @@ namespace MusicBox
             {
                 result = true;
             }
-            TrayIcon.Visible = true;
+            _tray_icon.Visible = true;
             return result;
         }
 
         private void ShowHideMainWindow(object sender, RoutedEventArgs e)
         {
-            TrayMenu.IsOpen = false;
+            _tray_menu.IsOpen = false;
             if (IsVisible)
             {
                 Hide();
-                (TrayMenu.Items[0] as MenuItem).Header = "Развернуть";
+                (_tray_menu.Items[0] as MenuItem).Header = "Развернуть";
             }
             else
             {
                 Show();
-                (TrayMenu.Items[0] as MenuItem).Header = "Свернуть";
+                (_tray_menu.Items[0] as MenuItem).Header = "Свернуть";
                 WindowState = CurrentWindowState;
                 Activate();
             }
@@ -122,7 +123,7 @@ namespace MusicBox
             if (this.WindowState == System.Windows.WindowState.Minimized)
             {
                 Hide();
-                (TrayMenu.Items[0] as MenuItem).Header = "Развернуть";
+                (_tray_menu.Items[0] as MenuItem).Header = "Развернуть";
             }
             else
             {
@@ -149,18 +150,18 @@ namespace MusicBox
             {    
                 e.Cancel = true;
                 CurrentWindowState = this.WindowState;
-                (TrayMenu.Items[0] as MenuItem).Header = "Развернуть";
+                (_tray_menu.Items[0] as MenuItem).Header = "Развернуть";
                 Hide();
             }
             else
             {
-                TrayIcon.Visible = false;
+                _tray_icon.Visible = false;
             }
         }
 
         private void timer_Tick(object sender, EventArgs e)
         {
-            if ((mediaElement.Source != null) && (mediaElement.NaturalDuration.HasTimeSpan) && (!userIsDraggingSlider))
+            if ((mediaElement.Source != null) && (mediaElement.NaturalDuration.HasTimeSpan) && (!_user_is_dragging_slider))
             {
                 sliProgress.Minimum = 0;
                 sliProgress.Maximum = mediaElement.NaturalDuration.TimeSpan.TotalSeconds;
@@ -185,7 +186,7 @@ namespace MusicBox
 
         private void sliProgress_DragStarted(object sender, DragStartedEventArgs e)
         {
-            userIsDraggingSlider = true;
+            _user_is_dragging_slider = true;
 
             sliderVolume.Visibility = System.Windows.Visibility.Collapsed;
             btnMinimize.Visibility = System.Windows.Visibility.Visible;
@@ -194,7 +195,7 @@ namespace MusicBox
 
         private void sliProgress_DragCompleted(object sender, DragCompletedEventArgs e)
         {
-            userIsDraggingSlider = false;
+            _user_is_dragging_slider = false;
             mediaElement.Position = TimeSpan.FromSeconds(sliProgress.Value);
         }
 
@@ -240,7 +241,7 @@ namespace MusicBox
                 textboxSearch.Visibility = System.Windows.Visibility.Collapsed;
                 if (AppSettings.IsFind)
                 {
-                    backgroundThread.RunWorkerAsync();
+                    _backgroundThread.RunWorkerAsync();
                 }
             }
         }
@@ -270,13 +271,13 @@ namespace MusicBox
             sliProgress.IsEnabled = true;
             if (!AppSettings.IsPlaying)
             {
-                if (audio_list.Count > current_song)
+                if (_audio_list.Count > _current_song)
                 {
-                    if (mediaElement.Source != new Uri(audio_list[current_song].url))
-                        mediaElement.Source = new Uri(audio_list[current_song].url);
+                    if (mediaElement.Source != new Uri(_audio_list[_current_song].Url))
+                        mediaElement.Source = new Uri(_audio_list[_current_song].Url);
                     AppSettings.IsPlaying = true;
-                    playList.SelectedIndex = current_song;
-                    labelSong.Content = audio_list[current_song].artist + ": " + audio_list[current_song].title;
+                    playList.SelectedIndex = _current_song;
+                    labelSong.Content = _audio_list[_current_song].Artist + ": " + _audio_list[_current_song].Title;
                     mediaElement.Play();
                 }
             }
@@ -289,7 +290,7 @@ namespace MusicBox
 
         private void Grid_Loaded(object sender, RoutedEventArgs e)
         {
-            backgroundThread.RunWorkerAsync();
+            _backgroundThread.RunWorkerAsync();
         }
 
         public void btnNext_Click(object sender, RoutedEventArgs e)
@@ -298,15 +299,15 @@ namespace MusicBox
             btnMinimize.Visibility = System.Windows.Visibility.Visible;
             AppSettings.VolumeActive = false;
 
-            if (current_song + 1 <= audio_list.Count - 1)
+            if (_current_song + 1 <= _audio_list.Count - 1)
             {
-                current_song++;
+                _current_song++;
                 playList.SelectedIndex++;
             }
             if (AppSettings.IsPlaying)
             {
-                mediaElement.Source = new Uri(audio_list[current_song].url);
-                labelSong.Content = audio_list[current_song].artist + ": " + audio_list[current_song].title;
+                mediaElement.Source = new Uri(_audio_list[_current_song].Url);
+                labelSong.Content = _audio_list[_current_song].Artist + ": " + _audio_list[_current_song].Title;
                 mediaElement.Play();
             }
         }
@@ -317,15 +318,15 @@ namespace MusicBox
             btnMinimize.Visibility = System.Windows.Visibility.Visible;
             AppSettings.VolumeActive = false;
 
-            if (current_song - 1 >= 0)
+            if (_current_song - 1 >= 0)
             {
-                current_song--;
+                _current_song--;
                 playList.SelectedIndex--;
             }
             if (AppSettings.IsPlaying)
             {
-                mediaElement.Source = new Uri(audio_list[current_song].url);
-                labelSong.Content = audio_list[current_song].artist + ": " + audio_list[current_song].title;
+                mediaElement.Source = new Uri(_audio_list[_current_song].Url);
+                labelSong.Content = _audio_list[_current_song].Artist + ": " + _audio_list[_current_song].Title;
                 mediaElement.Play();
             }
         }
@@ -340,14 +341,14 @@ namespace MusicBox
         private void playList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             sliProgress.IsEnabled = true;
-            if (playList.SelectedIndex <= audio_list.Count - 1 && playList.SelectedIndex != -1)
+            if (playList.SelectedIndex <= _audio_list.Count - 1 && playList.SelectedIndex != -1)
             {
-                current_song = playList.SelectedIndex;
-                mediaElement.Source = new Uri(audio_list[current_song].url);
-                labelSong.Content = audio_list[current_song].artist + ": " + audio_list[current_song].title;
+                _current_song = playList.SelectedIndex;
+                mediaElement.Source = new Uri(_audio_list[_current_song].Url);
+                labelSong.Content = _audio_list[_current_song].Artist + ": " + _audio_list[_current_song].Title;
                 AppSettings.IsPlaying = true;
                 mediaElement.Play();
-                checkAdd(audio_list[current_song]);
+                checkAdd(_audio_list[_current_song]);
             }
 
             playList.ScrollIntoView(playList.SelectedItem);
@@ -373,18 +374,18 @@ namespace MusicBox
             int i = playList.SelectedIndex;
             if (AppSettings.AddMode)
             {
-                request.addToMyAudio(audio_list[i]);
-                my_audio.Add(audio_list[i]);
+                _request.addToMyAudio(_audio_list[i]);
+                _my_audio.Add(_audio_list[i]);
             }
             else
             {
-                request.deleteFromMyAudio(audio_list[i]);
-                my_audio.Remove(audio_list[i]);
-                fillListBox(my_audio);
-                audio_list = my_audio;
+                _request.deleteFromMyAudio(_audio_list[i]);
+                _my_audio.Remove(_audio_list[i]);
+                fillListBox(_my_audio);
+                _audio_list = _my_audio;
                 mediaElement.Pause();
             }
-            checkAdd(audio_list[i]);
+            checkAdd(_audio_list[i]);
         }
 
         private void btnRepeat_Click(object sender, RoutedEventArgs e)
@@ -415,15 +416,15 @@ namespace MusicBox
             {
                 AppSettings.RandomOrder = false;
                 btnRandom.Opacity = 0.3;
-                audio_list = reorderAudioList(audio_list, order);
-                fillListBox(audio_list);
+                _audio_list = reorderAudioList(_audio_list, _order);
+                fillListBox(_audio_list);
             }
             else
             {
                 AppSettings.RandomOrder = true;
                 btnRandom.Opacity = 1.0;
-                shuffleAudioList(audio_list);
-                fillListBox(audio_list);
+                shuffleAudioList(_audio_list);
+                fillListBox(_audio_list);
             }
         }
 
@@ -456,7 +457,7 @@ namespace MusicBox
             {
                 AppSettings.AdviseMode = false;
                 btnAdvise.Opacity = 0.3;
-                backgroundThread.RunWorkerAsync();
+                _backgroundThread.RunWorkerAsync();
             }
             else
             {
@@ -478,7 +479,7 @@ namespace MusicBox
             {
                 AppSettings.PopularMode = false;
                 btnPopular.Opacity = 0.3;
-                backgroundThread.RunWorkerAsync();
+                _backgroundThread.RunWorkerAsync();
             }
             else
             {
@@ -557,11 +558,11 @@ namespace MusicBox
         {
             clearPlayList();
 
-            audio_list = request.getMyAudioList();
-            my_audio = audio_list;
-            setOrder(audio_list, order);
+            _audio_list = _request.getMyAudioList();
+            _my_audio = _audio_list;
+            setOrder(_audio_list, _order);
 
-            fillPlayList(audio_list);
+            fillPlayList(_audio_list);
         }
 
         private void backgroundThread_SearchAudio(object sender, DoWorkEventArgs e)
@@ -583,27 +584,27 @@ namespace MusicBox
                 }));
             }
 
-            audio_list = request.searchAudio(search);
+            _audio_list = _request.searchAudio(search);
 
-            fillPlayList(audio_list);
+            fillPlayList(_audio_list);
         }
 
         private void backgroundThread_GetPopularAudio(object sender, DoWorkEventArgs e)
         {
             clearPlayList();
 
-            audio_list = request.getPopularAudioList();
+            _audio_list = _request.getPopularAudioList();
 
-            fillPlayList(audio_list);
+            fillPlayList(_audio_list);
         }
 
         private void backgroundThread_GetAdviseAudio(object sender, DoWorkEventArgs e)
         {
             clearPlayList();
 
-            audio_list = request.getAdviseAudioList();
+            _audio_list = _request.getAdviseAudioList();
 
-            fillPlayList(audio_list);
+            fillPlayList(_audio_list);
         }
 
 
@@ -648,7 +649,7 @@ namespace MusicBox
             try
             {
                 String name = "MusicBoxVKSong";
-                Uri source = new Uri(audio_list[0].url);
+                Uri source = new Uri(_audio_list[0].Url);
                 if (mediaElement.Dispatcher.CheckAccess())
                 {
                     source = mediaElement.Source;
@@ -663,13 +664,13 @@ namespace MusicBox
 
                 if (playList.Dispatcher.CheckAccess())
                 {
-                    name = audio_list[current_song].artist + ": " + audio_list[current_song].title;
+                    name = _audio_list[_current_song].Artist + ": " + _audio_list[_current_song].Title;
                 }
                 else
                 {
                     playList.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate()
                     {
-                        name = audio_list[current_song].artist + ": " + audio_list[current_song].title;
+                        name = _audio_list[_current_song].Artist + ": " + _audio_list[_current_song].Title;
                     }));
                 }
 
@@ -701,7 +702,7 @@ namespace MusicBox
             playList.Items.Clear();
             for (int i = 0; i < list.Count; i++)
             {
-                playList.Items.Add(list[i].title);
+                playList.Items.Add(list[i].Title);
             }
         }
 
@@ -738,9 +739,9 @@ namespace MusicBox
 
         private bool isInMyAudio(Audio song)
         {
-            foreach (Audio a in my_audio)
+            foreach (Audio a in _my_audio)
             {
-                if (a.aid == song.aid && a.owner_id == song.owner_id)
+                if (a.AudioID == song.AudioID && a.OwnerID == song.OwnerID)
                     return true;
             }
             return false;
@@ -748,10 +749,10 @@ namespace MusicBox
 
         private void shuffleAudioList(List<Audio> audio_list)
         {
-            order.Clear();
+            _order.Clear();
             for (int i = 0; i < audio_list.Count; i++)
             {
-                order.Add(i);
+                _order.Add(i);
             }
 
             Random rng = new Random();
@@ -764,9 +765,9 @@ namespace MusicBox
                 audio_list[k] = audio_list[n];
                 audio_list[n] = value;
 
-                int s = order[k];
-                order[k] = order[n];
-                order[n] = s;
+                int s = _order[k];
+                _order[k] = _order[n];
+                _order[n] = s;
 
             }
         }

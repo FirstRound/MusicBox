@@ -6,13 +6,16 @@ using System.Text;
 
 namespace MusicBox
 {
-    class VkSettings
+    public class VkSettings
     {
-        public static String Login;
-        public static String Password;
+        private bool _auth;
+        private String _user_id;
+        private String _token;
 
-        public static bool Auth;
-        public static String Id;
-        public static String Token;
+        public bool Auth{get; set;}
+        public String UserId { get; set; }
+        public String Token { get; set; }
+
+
     }
 }

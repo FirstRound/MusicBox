@@ -43,10 +43,11 @@ namespace MusicBox
                 String info = url.Split('#')[1];
                 if (info[0] == 'a')
                 {
-                    VkSettings.Token = info.Split('&')[0].Split('=')[1];
-                    VkSettings.Id = info.Split('=')[3];
-                    VkSettings.Auth = true;
-                    MainWindow mw = new MainWindow();
+                    VkSettings vk = new VkSettings();
+                    vk.Token = info.Split('&')[0].Split('=')[1];
+                    vk.UserId = info.Split('=')[3];
+                    vk.Auth = true;
+                    MainWindow mw = new MainWindow(vk);
                     this.Hide();
                     mw.Show();
                 }

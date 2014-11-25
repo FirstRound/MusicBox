@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,13 +9,29 @@ namespace MusicBox
 {
     public class Audio
     {
-        public int aid {get; set;}
-        public int owner_id {get; set;}
-        public String artist  {get; set;}
-        public String title {get; set;}
-        public int duration {get; set;}
-        public String url {get; set;}
-        public String lurics_id {get; set;}
-        public int genre { get; set; }
+
+        [JsonProperty("aid")] 
+        public int AudioID {get; set;}
+
+        [JsonProperty("owner_id")] 
+        public int OwnerID {get; set;}
+
+        [JsonProperty("artist")] 
+        public String Artist  {get; set;}
+
+        [JsonProperty("title")] 
+        public String Title {get; set;}
+
+        [JsonProperty("duration")] 
+        public int Duration {get; set;}
+
+        [JsonProperty("url")] 
+        public String Url {get; set;}
+
+        [JsonProperty("lurics_id")] 
+        public String LuricsID {get; set;}
+
+        [JsonProperty("genre")]
+        public int Genre { get; set; }
     }
 }
