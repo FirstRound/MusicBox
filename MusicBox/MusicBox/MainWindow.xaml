@@ -1,7 +1,7 @@
 ﻿<Window x:Class="MusicBox.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="MusicBox" Height="350" Width="251.4" ResizeMode="NoResize" WindowStyle="None">
+        Title="MusicBox" Height="380.8" Width="251.4" ResizeMode="NoResize" WindowStyle="None">
     <Window.Resources>
 
         <ContextMenu x:Key="TrayMenu">
@@ -131,19 +131,10 @@
 
 
     <!-- Main -->
-    <Border BorderBrush="Black" BorderThickness="0">
-        <Grid Margin="0.4,-1.6,-0.2,-1" RenderTransformOrigin="0.498,0.628" Loaded="Grid_Loaded" MouseLeftButtonDown="Grid_MouseLeftButtonDown">
+    <Border BorderBrush="Black" BorderThickness="0" Margin="0,0,0.2,-0.2">
+        <Grid Margin="0,-2,0.2,-44.2" RenderTransformOrigin="0.498,0.628" Loaded="Grid_Loaded" MouseLeftButtonDown="Grid_MouseLeftButtonDown">
             <Grid.Background>
-                <ImageBrush ImageSource="Style/bg.png" Opacity="0.85" Stretch="UniformToFill">
-                    <ImageBrush.RelativeTransform>
-                        <TransformGroup>
-                            <ScaleTransform CenterY="0.5" CenterX="0.5"/>
-                            <SkewTransform CenterY="0.5" CenterX="0.5"/>
-                            <RotateTransform CenterY="0.5" CenterX="0.5"/>
-                            <TranslateTransform/>
-                        </TransformGroup>
-                    </ImageBrush.RelativeTransform>
-                </ImageBrush>
+                <ImageBrush ImageSource="Style/bg_2.png" Stretch="UniformToFill"/>
             </Grid.Background>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="0*"/>
@@ -152,8 +143,8 @@
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="0*"/>
-                <RowDefinition Height="173.6"/>
-                <RowDefinition Height="174.4"/>
+                <RowDefinition Height="422.4"/>
+                <RowDefinition Height="0*"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
             <Button Name="btnPlay" Style="{DynamicResource ButtonStyle1}" HorizontalAlignment="Left" Height="58" Margin="91,13,0,0" VerticalAlignment="Top" Width="72" Background="{x:Null}" BorderBrush="{x:Null}" Cursor="Hand" Focusable="False" PreviewMouseDown="Button_PreviewMouseDown" Click="btnPlay_Click" Grid.ColumnSpan="2" Grid.RowSpan="2">
@@ -275,13 +266,13 @@
 
             <TextBox Name="textboxSearch" Visibility="Collapsed" HorizontalAlignment="Left" Height="20" Margin="10,74,0,0" VerticalAlignment="Top" Width="231" Text="" KeyUp="textboxSearch_KeyUp" Grid.ColumnSpan="2" Grid.RowSpan="2"/>
 
-            <Slider Visibility="Visible" Name="sliProgress" Thumb.DragStarted="sliProgress_DragStarted"  Thumb.DragCompleted="sliProgress_DragCompleted" Style="{StaticResource Horizontal_Slider}" VerticalAlignment="Center"  Value="0" Margin="0,79,0.2,79.6" IsEnabled="False" Height="15" Grid.ColumnSpan="2" Grid.RowSpan="2">
+            <Slider Visibility="Visible" Name="sliProgress" Thumb.DragStarted="sliProgress_DragStarted"  Thumb.DragCompleted="sliProgress_DragCompleted" Style="{StaticResource Horizontal_Slider}" VerticalAlignment="Center"  Value="0" Margin="0,80,0.2,327.4" IsEnabled="False" Height="15" Grid.ColumnSpan="2" Grid.RowSpan="2">
                 <Slider.Effect>
                     <DropShadowEffect BlurRadius="9" Opacity="0.25" ShadowDepth="4"/>
                 </Slider.Effect>
             </Slider>
             <!--Visibility="Collapsed"-->
-            <ListBox  Name="playList" Cursor="Hand" ItemContainerStyle="{StaticResource RoundedItem}" HorizontalAlignment="Left" Height="245" Margin="0,93,0,0" VerticalAlignment="Top" Width="251" SelectionChanged="playList_SelectionChanged" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Grid.ColumnSpan="2" Grid.RowSpan="3" Background="{x:Null}" Foreground="Black" BorderBrush="{x:Null}">
+            <ListBox  Name="playList" Cursor="Hand" ItemContainerStyle="{StaticResource RoundedItem}" HorizontalAlignment="Left" Height="279" Margin="0,93,0,0" VerticalAlignment="Top" Width="251" SelectionChanged="playList_SelectionChanged" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Grid.ColumnSpan="2" Foreground="Black" BorderBrush="{x:Null}" Grid.Row="1" Background="{x:Null}">
                 <ListBox.Resources>
                     <Style TargetType="{x:Type ScrollBar}">
                         <Setter Property="Stylus.IsFlicksEnabled" Value="True" />
@@ -293,9 +284,9 @@
                 </ListBox.Resources>
                 <ListBoxItem Content="ListBox Один из 33" Height="40" FontSize="18" FontFamily="Segoe WP SemiLight"/>
             </ListBox>
-            <MediaElement LoadedBehavior="Manual" UnloadedBehavior="Manual" MediaOpened="Element_AudioOpened" Name="mediaElement" Margin="117,75.4,10.2,47" Volume="1" Grid.ColumnSpan="2" Grid.Row="2" />
+            <MediaElement LoadedBehavior="Manual" UnloadedBehavior="Manual" MediaOpened="Element_AudioOpened" Name="mediaElement" Margin="117,250,10.2,84.4" Volume="1" Grid.ColumnSpan="2" Grid.Row="1" />
             <Label Content="MusicBox" Name="labelSong" HorizontalAlignment="Left" HorizontalContentAlignment="Center" Height="25" Margin="44,-3,0,0" VerticalAlignment="Top" Width="182" FontSize="10" FontStyle="Italic" MouseLeftButtonDown="Label_MouseLeftButtonDown" Grid.ColumnSpan="2" Grid.RowSpan="2"/>
-            <Label HorizontalContentAlignment="Center" Name="loadingText" Content="Подождите, идет загрузка..." HorizontalAlignment="Left" Height="32" Margin="18,1.4,0,0" VerticalAlignment="Top" Width="213" FontWeight="Medium" FontSize="14" ScrollViewer.VerticalScrollBarVisibility="Disabled" Grid.ColumnSpan="2" Grid.Row="2"/>
+            <Label HorizontalContentAlignment="Center" Name="loadingText" Content="Подождите, идет загрузка..." HorizontalAlignment="Left" Height="32" Margin="18,176,0,0" VerticalAlignment="Top" Width="213" FontWeight="Medium" FontSize="14" ScrollViewer.VerticalScrollBarVisibility="Disabled" Grid.ColumnSpan="2" Grid.Row="1"/>
             <Label Name="labelTime" HorizontalContentAlignment="Center" Content="0:00" HorizontalAlignment="Left" Height="16" Margin="190,23,0,0" VerticalAlignment="Top" Width="31" FontSize="10" ScrollViewer.VerticalScrollBarVisibility="Disabled" VerticalContentAlignment="Stretch" Padding="0" Grid.IsSharedSizeScope="True" Grid.ColumnSpan="2" Grid.RowSpan="2"/>
 
 
