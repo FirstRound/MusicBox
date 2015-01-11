@@ -40,6 +40,9 @@
     <ApplicationIcon>Resources\favicon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CODE.Framework.Wpf.Theme.Metro">
+      <HintPath>C:\Users\Vlad-Programmer\Desktop\MusicBox 1.0.1\CODE.Framework.Wpf.Theme.Metro.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>.\Newtonsoft.Json.dll</HintPath>
@@ -76,9 +79,11 @@
     </ApplicationDefinition>
     <Compile Include="AppSettings.cs" />
     <Compile Include="Audio.cs" />
+    <Compile Include="AudioController.cs" />
     <Compile Include="Auth.xaml.cs">
       <DependentUpon>Auth.xaml</DependentUpon>
     </Compile>
+    <Compile Include="GlassExtensions.cs" />
     <Compile Include="Request.cs" />
     <Compile Include="VkSettings.cs" />
     <Compile Include="WebProvider.cs" />
@@ -152,12 +157,6 @@
     <Resource Include="Style\download.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Style\bg1.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Style\bg2.jpg" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Style\bg3.jpg" />
   </ItemGroup>
   <ItemGroup>
@@ -180,6 +179,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\favicon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Style\bg.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Style\bg_1.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" />

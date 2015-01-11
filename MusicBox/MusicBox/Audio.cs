@@ -33,5 +33,13 @@ namespace MusicBox
 
         [JsonProperty("genre")]
         public int Genre { get; set; }
+
+        public String Description
+        {
+            get
+            {
+                return Artist + ": " + Title;
+            }
+        }
     }
 }

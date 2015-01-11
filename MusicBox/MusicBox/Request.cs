@@ -62,7 +62,7 @@ namespace MusicBox
         {
             try
             {
-                _provider.addAudio(audio.AudioID, audio.OwnerID);
+                _provider.deleteAudio(audio.AudioID, audio.OwnerID);
             }
             catch (Exception ex)
             {

@@ -30,13 +30,18 @@ namespace MusicBox
     {
         private BackgroundWorker _backgroundThread = new BackgroundWorker();
         private Request _request;
-        private List<Audio> _audio_list = new List<Audio>();
-        private List<Audio> _my_audio = new List<Audio>();
+        //private List<Audio> _audio_list = new List<Audio>();
+        //private List<Audio> _my_audio = new List<Audio>();
         private List<int> _order = new List<int>();
-        private int _current_song = 0;
+       // private int _current_song = 0;
         private bool _user_is_dragging_slider = false;
         private ContextMenu _tray_menu = null;
         private System.Windows.Forms.NotifyIcon _tray_icon = null;
+
+        //
+        private AudioController _audio_controller;
+        private WindowState fCurrentWindowState = WindowState.Normal;
+        //
 
         private bool fCanClose = false;
 
@@ -45,6 +50,7 @@ namespace MusicBox
             InitializeComponent();
 
             _request = new Request(vk);
+            _audio_controller = new AudioController(vk);
 
             labelSong.MouseLeftButtonDown += new MouseButtonEventHandler(Label_MouseLeftButtonDown);
             _backgroundThread.DoWork += backgroundThread_GetAudio;
@@ -110,7 +116,6 @@ namespace MusicBox
             }
         }
 
-        private WindowState fCurrentWindowState = WindowState.Normal;
         public WindowState CurrentWindowState
         {
             get { return fCurrentWindowState; }
@@ -172,7 +177,7 @@ namespace MusicBox
                     labelTime.Content = ((int)(mediaElement.Position.TotalMinutes)).ToString() + ":" + (Math.Round(mediaElement.Position.TotalSeconds, 0) % 60).ToString();
                 if (mediaElement.NaturalDuration == mediaElement.Position)
                 {
-                    if (AppSettings.RepeatSong)
+                    if (AppSettings.sRepeatSong)
                     {
                         this.playList_SelectionChanged(null, null);
                     }
@@ -190,7 +195,7 @@ namespace MusicBox
 
             sliderVolume.Visibility = System.Windows.Visibility.Collapsed;
             btnMinimize.Visibility = System.Windows.Visibility.Visible;
-            AppSettings.VolumeActive = false;
+            AppSettings.sVolumeActive = false;
         }
 
         private void sliProgress_DragCompleted(object sender, DragCompletedEventArgs e)
@@ -201,7 +206,7 @@ namespace MusicBox
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            if (!AppSettings.IsDownloading)
+            if (!AppSettings.sIsDownloading)
                 Application.Current.Shutdown();
             else
             {
@@ -231,7 +236,7 @@ namespace MusicBox
                 sliProgress.Visibility = System.Windows.Visibility.Collapsed;
                 textboxSearch.IsEnabled = true;
                 textboxSearch.Visibility = System.Windows.Visibility.Visible;
-                AppSettings.IsFind = false;
+                AppSettings.sIsFind = false;
 
             }
             else
@@ -239,7 +244,7 @@ namespace MusicBox
                 sliProgress.Visibility = System.Windows.Visibility.Visible;
                 textboxSearch.IsEnabled = false;
                 textboxSearch.Visibility = System.Windows.Visibility.Collapsed;
-                if (AppSettings.IsFind)
+                if (AppSettings.sIsFind)
                 {
                     _backgroundThread.RunWorkerAsync();
                 }
@@ -250,7 +255,7 @@ namespace MusicBox
         {
             sliderVolume.Visibility = System.Windows.Visibility.Collapsed;
             btnMinimize.Visibility = System.Windows.Visibility.Visible;
-            AppSettings.VolumeActive = false;
+            AppSettings.sVolumeActive = false;
 
             try
             {
@@ -266,26 +271,10 @@ namespace MusicBox
         {
             sliderVolume.Visibility = System.Windows.Visibility.Collapsed;
             btnMinimize.Visibility = System.Windows.Visibility.Visible;
-            AppSettings.VolumeActive = false;
-
+            AppSettings.sVolumeActive = false;
             sliProgress.IsEnabled = true;
-            if (!AppSettings.IsPlaying)
-            {
-                if (_audio_list.Count > _current_song)
-                {
-                    if (mediaElement.Source != new Uri(_audio_list[_current_song].Url))
-                        mediaElement.Source = new Uri(_audio_list[_current_song].Url);
-                    AppSettings.IsPlaying = true;
-                    playList.SelectedIndex = _current_song;
-                    labelSong.Content = _audio_list[_current_song].Artist + ": " + _audio_list[_current_song].Title;
-                    mediaElement.Play();
-                }
-            }
-            else
-            {
-                AppSettings.IsPlaying = false;
-                mediaElement.Pause();
-            }
+            labelSong.Content = _audio_controller.Play(ref mediaElement);
+            playList.SelectedIndex = _audio_controller.CurrentSong; // второй раз запускается плеер - проблема
         }
 
         private void Grid_Loaded(object sender, RoutedEventArgs e)
@@ -297,38 +286,20 @@ namespace MusicBox
         {
             sliderVolume.Visibility = System.Windows.Visibility.Collapsed;
             btnMinimize.Visibility = System.Windows.Visibility.Visible;
-            AppSettings.VolumeActive = false;
-
-            if (_current_song + 1 <= _audio_list.Count - 1)
-            {
-                _current_song++;
-                playList.SelectedIndex++;
-            }
-            if (AppSettings.IsPlaying)
-            {
-                mediaElement.Source = new Uri(_audio_list[_current_song].Url);
-                labelSong.Content = _audio_list[_current_song].Artist + ": " + _audio_list[_current_song].Title;
-                mediaElement.Play();
-            }
+            AppSettings.sVolumeActive = false;
+            Audio next = _audio_controller.GetNextSong();
+            labelSong.Content = next.Description;
+            playList.SelectedIndex = _audio_controller.CurrentSong;
         }
 
         private void btnPrev_Click(object sender, RoutedEventArgs e)
         {
             sliderVolume.Visibility = System.Windows.Visibility.Collapsed;
             btnMinimize.Visibility = System.Windows.Visibility.Visible;
-            AppSettings.VolumeActive = false;
-
-            if (_current_song - 1 >= 0)
-            {
-                _current_song--;
-                playList.SelectedIndex--;
-            }
-            if (AppSettings.IsPlaying)
-            {
-                mediaElement.Source = new Uri(_audio_list[_current_song].Url);
-                labelSong.Content = _audio_list[_current_song].Artist + ": " + _audio_list[_current_song].Title;
-                mediaElement.Play();
-            }
+            AppSettings.sVolumeActive = false;
+            Audio prev = _audio_controller.GetPrevSong();
+            labelSong.Content = prev.Description;
+            playList.SelectedIndex = _audio_controller.CurrentSong;
         }
 
         private void Element_AudioOpened(object sender, EventArgs e)
@@ -341,14 +312,13 @@ namespace MusicBox
         private void playList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             sliProgress.IsEnabled = true;
-            if (playList.SelectedIndex <= _audio_list.Count - 1 && playList.SelectedIndex != -1)
+            _audio_controller.CurrentSong = playList.SelectedIndex;
+            if (sender != null && playList.SelectedIndex <= _audio_controller.CurrentAudioList.Count - 1 && playList.SelectedIndex != -1)
             {
-                _current_song = playList.SelectedIndex;
-                mediaElement.Source = new Uri(_audio_list[_current_song].Url);
-                labelSong.Content = _audio_list[_current_song].Artist + ": " + _audio_list[_current_song].Title;
-                AppSettings.IsPlaying = true;
+                labelSong.Content = _audio_controller.SelectionChanged(ref mediaElement);
+                AppSettings.sIsPlaying = true;
                 mediaElement.Play();
-                checkAdd(_audio_list[_current_song]);
+                checkAdd(_audio_controller.CurrentAudio);
             }
 
             playList.ScrollIntoView(playList.SelectedItem);
@@ -359,7 +329,7 @@ namespace MusicBox
         {
             if (e.Key == Key.Enter)
             {
-                AppSettings.IsFind = true;
+                AppSettings.sIsFind = true;
                 BackgroundWorker bw = new BackgroundWorker();
                 bw.DoWork += backgroundThread_SearchAudio;
                 bw.RunWorkerAsync();
@@ -372,36 +342,33 @@ namespace MusicBox
             if (playList.SelectedIndex == -1)
                 return;
             int i = playList.SelectedIndex;
-            if (AppSettings.AddMode)
+
+            _audio_controller.Add(i);
+
+            if (!_audio_controller.Settings.AddMode)
             {
-                _request.addToMyAudio(_audio_list[i]);
-                _my_audio.Add(_audio_list[i]);
-            }
-            else
-            {
-                _request.deleteFromMyAudio(_audio_list[i]);
-                _my_audio.Remove(_audio_list[i]);
-                fillListBox(_my_audio);
-                _audio_list = _my_audio;
+                fillListBox(_audio_controller.MyAudioList);
+                _audio_controller.ChangeToMyAudioList();
                 mediaElement.Pause();
             }
-            checkAdd(_audio_list[i]);
+
+            checkAdd(_audio_controller.CurrentAudioList[i]);
         }
 
         private void btnRepeat_Click(object sender, RoutedEventArgs e)
         {
             sliderVolume.Visibility = System.Windows.Visibility.Collapsed;
             btnMinimize.Visibility = System.Windows.Visibility.Visible;
-            AppSettings.VolumeActive = false;
+            AppSettings.sVolumeActive = false;
 
-            if (AppSettings.RepeatSong)
+            if (AppSettings.sRepeatSong)
             {
-                AppSettings.RepeatSong = false;
+                AppSettings.sRepeatSong = false;
                 btnRepeat.Opacity = 0.3;
             }
             else
             {
-                AppSettings.RepeatSong = true;
+                AppSettings.sRepeatSong = true;
                 btnRepeat.Opacity = 1.0;
             }
         }
@@ -410,61 +377,52 @@ namespace MusicBox
         {
             sliderVolume.Visibility = System.Windows.Visibility.Collapsed;
             btnMinimize.Visibility = System.Windows.Visibility.Visible;
-            AppSettings.VolumeActive = false;
+            AppSettings.sVolumeActive = false;
 
-            if (AppSettings.RandomOrder)
+            bool isRandom = _audio_controller.Shuffle();
+
+            if (isRandom)
             {
-                AppSettings.RandomOrder = false;
+                AppSettings.sRandomOrder = false;
                 btnRandom.Opacity = 0.3;
-                _audio_list = reorderAudioList(_audio_list, _order);
-                fillListBox(_audio_list);
+                fillListBox(_audio_controller.CurrentAudioList);
             }
             else
             {
-                AppSettings.RandomOrder = true;
+                AppSettings.sRandomOrder = true;
                 btnRandom.Opacity = 1.0;
-                shuffleAudioList(_audio_list);
-                fillListBox(_audio_list);
+                fillListBox(_audio_controller.CurrentAudioList);
             }
         }
 
         private void btnVolume_Click(object sender, RoutedEventArgs e)
         {
-            if (AppSettings.VolumeActive)
-            {
-                AppSettings.VolumeActive = false;
-                btnMinimize.Visibility = System.Windows.Visibility.Visible;
-                sliderVolume.Visibility = System.Windows.Visibility.Collapsed;
-            }
-            else
-            {
-                AppSettings.VolumeActive = true;
-                btnMinimize.Visibility = System.Windows.Visibility.Collapsed;
-                sliderVolume.Visibility = System.Windows.Visibility.Visible;
-            }
+            _audio_controller.Settings.VolumeActive = !(_audio_controller.Settings.VolumeActive);
+            ChangeVisibility(btnMinimize);
+            ChangeVisibility(sliderVolume);
         }
 
         private void Grid_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             sliderVolume.Visibility = System.Windows.Visibility.Collapsed;
             btnMinimize.Visibility = System.Windows.Visibility.Visible;
-            AppSettings.VolumeActive = false;
+            AppSettings.sVolumeActive = false;
         }
 
         private void btnAdvise_Click(object sender, RoutedEventArgs e)
         {
-            if (AppSettings.AdviseMode)
+            if (AppSettings.sAdviseMode)
             {
-                AppSettings.AdviseMode = false;
+                AppSettings.sAdviseMode = false;
                 btnAdvise.Opacity = 0.3;
                 _backgroundThread.RunWorkerAsync();
             }
             else
             {
-                AppSettings.PopularMode = false;
+                AppSettings.sPopularMode = false;
                 btnPopular.Opacity = 0.3;
 
-                AppSettings.AdviseMode = true;
+                AppSettings.sAdviseMode = true;
                 btnAdvise.Opacity = 1.0;
                 BackgroundWorker bw = new BackgroundWorker();
                 bw.DoWork += backgroundThread_GetAdviseAudio;
@@ -475,18 +433,18 @@ namespace MusicBox
 
         private void btnPopular_Click(object sender, RoutedEventArgs e)
         {
-            if (AppSettings.PopularMode)
+            if (AppSettings.sPopularMode)
             {
-                AppSettings.PopularMode = false;
+                AppSettings.sPopularMode = false;
                 btnPopular.Opacity = 0.3;
                 _backgroundThread.RunWorkerAsync();
             }
             else
             {
-                AppSettings.AdviseMode = false;
+                AppSettings.sAdviseMode = false;
                 btnAdvise.Opacity = 0.3;
 
-                AppSettings.PopularMode = true;
+                AppSettings.sPopularMode = true;
                 btnPopular.Opacity = 1.0;
                 BackgroundWorker bw = new BackgroundWorker();
                 bw.DoWork += backgroundThread_GetPopularAudio;
@@ -509,46 +467,20 @@ namespace MusicBox
 
         private void btnMenu_Click(object sender, RoutedEventArgs e)
         {
-            if (AppSettings.MenuOn)
-            {
-                AppSettings.MenuOn = false;
+            _audio_controller.Settings.MenuOn = !(_audio_controller.Settings.MenuOn);
+            ChangeVisibility(menuStripe);
 
-                menuStripe.Visibility = System.Windows.Visibility.Collapsed;
+            ChangeVisibility(btnRepeat);
+            ChangeVisibility(btnVolume);
+            ChangeVisibility(btnRandom);
+            ChangeVisibility(btnMinimize);
 
-                btnRepeat.Visibility = System.Windows.Visibility.Visible;
-                btnVolume.Visibility = System.Windows.Visibility.Visible;
-                btnRandom.Visibility = System.Windows.Visibility.Visible;
-                btnMinimize.Visibility = System.Windows.Visibility.Visible;
-
-                btnPopular.Visibility = System.Windows.Visibility.Collapsed;
-                btnAdvise.Visibility = System.Windows.Visibility.Collapsed;
-                btnSearch.Visibility = System.Windows.Visibility.Collapsed;
-                btnAdd.Visibility = System.Windows.Visibility.Collapsed;
-                sliderVolume.Visibility = System.Windows.Visibility.Collapsed;
-                btnDownload.Visibility = System.Windows.Visibility.Collapsed;
-                btnExit.Visibility = System.Windows.Visibility.Collapsed;
-
-                sliderVolume.Visibility = System.Windows.Visibility.Collapsed;
-            }
-            else
-            {
-                AppSettings.MenuOn = true;
-                menuStripe.Visibility = System.Windows.Visibility.Visible;
-
-                btnRepeat.Visibility = System.Windows.Visibility.Collapsed;
-                btnVolume.Visibility = System.Windows.Visibility.Collapsed;
-                btnRandom.Visibility = System.Windows.Visibility.Collapsed;
-                btnMinimize.Visibility = System.Windows.Visibility.Collapsed;
-
-                btnPopular.Visibility = System.Windows.Visibility.Visible;
-                btnAdvise.Visibility = System.Windows.Visibility.Visible;
-                btnSearch.Visibility = System.Windows.Visibility.Visible;
-                btnAdd.Visibility = System.Windows.Visibility.Visible;
-                btnDownload.Visibility = System.Windows.Visibility.Visible;
-                btnExit.Visibility = System.Windows.Visibility.Visible;
-
-                sliderVolume.Visibility = System.Windows.Visibility.Collapsed;
-            }
+            ChangeVisibility(btnPopular);
+            ChangeVisibility(btnAdvise);
+            ChangeVisibility(btnSearch);
+            ChangeVisibility(btnAdd);
+            ChangeVisibility(btnDownload);
+            ChangeVisibility(btnExit);
         }
 
 
@@ -557,88 +489,81 @@ namespace MusicBox
         private void backgroundThread_GetAudio(object sender, DoWorkEventArgs e)
         {
             clearPlayList();
-
-            _audio_list = _request.getMyAudioList();
-            _my_audio = _audio_list;
-            setOrder(_audio_list, _order);
-
-            fillPlayList(_audio_list);
+            _audio_controller.GetMyAudio();
+            fillPlayList(_audio_controller.CurrentAudioList);
         }
 
         private void backgroundThread_SearchAudio(object sender, DoWorkEventArgs e)
         {
             String search = "";
-            if (playList.Dispatcher.CheckAccess())
-            {
-                search = textboxSearch.Text;
-                playList.Items.Clear();
-                loadingText.Visibility = System.Windows.Visibility.Visible;
-            }
-            else
-            {
-                playList.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate()
+            var del = new Action(delegate()
                 {
                     search = textboxSearch.Text;
                     playList.Items.Clear();
                     loadingText.Visibility = System.Windows.Visibility.Visible;
-                }));
+                });
+
+            if (playList.Dispatcher.CheckAccess())
+            {
+                del.Invoke();
+            }
+            else
+            {
+                playList.Dispatcher.Invoke(DispatcherPriority.Normal, del);
             }
 
-            _audio_list = _request.searchAudio(search);
-
-            fillPlayList(_audio_list);
+            _audio_controller.SearchAudio(search);
+            fillPlayList(_audio_controller.CurrentAudioList);
         }
 
         private void backgroundThread_GetPopularAudio(object sender, DoWorkEventArgs e)
         {
             clearPlayList();
-
-            _audio_list = _request.getPopularAudioList();
-
-            fillPlayList(_audio_list);
+            _audio_controller.GetPopularAudio();
+            fillPlayList(_audio_controller.CurrentAudioList);
         }
 
         private void backgroundThread_GetAdviseAudio(object sender, DoWorkEventArgs e)
         {
             clearPlayList();
-
-            _audio_list = _request.getAdviseAudioList();
-
-            fillPlayList(_audio_list);
+            _audio_controller.GetAdviceAudio();
+            fillPlayList(_audio_controller.CurrentAudioList);
         }
 
 
         private void clearPlayList()
         {
-            if (playList.Dispatcher.CheckAccess())
-            {
-                playList.Items.Clear();
-                loadingText.Visibility = System.Windows.Visibility.Visible;
-            }
-            else
-            {
-                playList.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate()
+            var del = new Action(delegate()
                 {
                     playList.Items.Clear();
                     loadingText.Visibility = System.Windows.Visibility.Visible;
-                }));
+                });
+
+            if (playList.Dispatcher.CheckAccess())
+            {
+                del.Invoke();
+            }
+            else
+            {
+                playList.Dispatcher.Invoke(DispatcherPriority.Normal, del);
             }
         }
 
         private void fillPlayList(List<Audio> list)
         {
-            if (playList.Dispatcher.CheckAccess())
-            {
-                loadingText.Visibility = System.Windows.Visibility.Collapsed;
-                fillListBox(list);
-            }
-            else
-            {
-                playList.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate()
+            var del = new Action(delegate()
                 {
                     loadingText.Visibility = System.Windows.Visibility.Collapsed;
                     fillListBox(list);
-                }));
+                });
+
+            if (playList.Dispatcher.CheckAccess())
+            {
+                del.Invoke();
+            }
+            else
+            {
+                playList.Dispatcher.Invoke(DispatcherPriority.Normal, del);
             }
         }
 
@@ -646,6 +571,7 @@ namespace MusicBox
 
         private void backgroundThread_DownloadAudio(object sender, DoWorkEventArgs e)
         {
+            /*
             try
             {
                 String name = "MusicBoxVKSong";
@@ -686,15 +612,16 @@ namespace MusicBox
                 {
                     WebClient Client = new WebClient();
                     path = saveFileDialog.FileName;
-                    AppSettings.IsDownloading = true;
+                    AppSettings.sIsDownloading = true;
                     Client.DownloadFile(source, path);
-                    AppSettings.IsDownloading = false;
+                    AppSettings.sIsDownloading = false;
                 }
             }
             catch (Exception ex)
             {
                 //do smth
             }
+             */
         }
 
         private void fillListBox(List<Audio> list)
@@ -710,19 +637,20 @@ namespace MusicBox
         {
             if (isInMyAudio(song))
             {
-                if (AppSettings.AddMode)
+                if (_audio_controller.Settings.AddMode)
                 {
                     addBtnAnimation(0, 45);
-                    AppSettings.AddMode = false;
+                    _audio_controller.Settings.AddMode = false;
+
                 }
 
             }
             else
             {
-                if (!AppSettings.AddMode)
+                if (!_audio_controller.Settings.AddMode)
                 {
                     addBtnAnimation(45, 0);
-                    AppSettings.AddMode = true;
+                    _audio_controller.Settings.AddMode = true;
                 }
             }
         }
@@ -739,7 +667,7 @@ namespace MusicBox
 
         private bool isInMyAudio(Audio song)
         {
-            foreach (Audio a in _my_audio)
+            foreach (Audio a in _audio_controller.MyAudioList)
             {
                 if (a.AudioID == song.AudioID && a.OwnerID == song.OwnerID)
                     return true;
@@ -791,6 +719,19 @@ namespace MusicBox
                 right_ordered[order[i]] = audio_list[i];
             }
             return right_ordered;
+        }
+
+        private void ChangeVisibility(Control elem)
+        {
+            if (elem.Visibility == System.Windows.Visibility.Collapsed)
+            {
+                elem.Visibility = System.Windows.Visibility.Visible;
+            }
+            else 
+            {
+                elem.Visibility = System.Windows.Visibility.Collapsed;
+            }
+             
         }
 
         //END PRIVATE METHODS

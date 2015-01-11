@@ -54,7 +54,7 @@ namespace MusicBox
             }
             catch (Exception ex)
             {
-                //MessageBox.Show(ex.Message);
+                MessageBox.Show(ex.Message);
                 //WebBrowser_Loaded(null, null);
             }
         }
